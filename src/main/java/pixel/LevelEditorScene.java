@@ -1,11 +1,13 @@
 package pixel;
 
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import renderer.Shader;
 
 import java.awt.event.KeyEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import util.Time;
 
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -38,10 +40,10 @@ public class LevelEditorScene extends Scene{
     private Shader defaultShader;
     private float[] vertexArray = {
         // postions             // colors
-         0.5f,  -0.5f, 0.0f,    1.0f, 0.0f, 0.0f, 1.0f, // bottom right 0
-        -0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f, 1.0f, // top left     1
-         0.5f,   0.5f, 0.0f,    0.0f, 0.0f, 1.0f, 1.0f, // top right    2
-        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f, 1.0f, // bottom left  3
+        100.5f, 0.5f, 0.0f,       1.0f, 0.0f, 0.0f, 1.0f, // Bottom right 0
+        0.5f,  100.5f, 0.0f,       0.0f, 1.0f, 0.0f, 1.0f, // Top left     1
+        100.5f,  100.5f, 0.0f ,      1.0f, 0.0f, 1.0f, 1.0f, // Top right    2
+        0.5f, 0.5f, 0.0f,       1.0f, 1.0f, 0.0f, 1.0f, // Bottom left  3
     };
 
     private int[] elementArray = {
@@ -61,6 +63,7 @@ public class LevelEditorScene extends Scene{
 
     @Override
     public void init(){
+        this.camera = new Camera(new Vector2f());
         defaultShader = new Shader("assets/shaders/default.glsl");
         defaultShader.compileAndLink();
 
@@ -102,7 +105,11 @@ public class LevelEditorScene extends Scene{
 
     @Override
     public void update(float dt) {
+//        camera.position.x -= dt * 50.0f;
         defaultShader.use();
+        defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
+        defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+        defaultShader.uploadFloat("uTime", Time.getTime());
 
         // bind the vao
         glBindVertexArray(vaoID);
