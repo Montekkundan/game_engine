@@ -5,6 +5,8 @@ import org.lwjgl.BufferUtils;
 import renderer.Shader;
 import renderer.Texture;
 import java.awt.event.KeyEvent;
+import components.FontRenderer;
+import components.SpriteRenderer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import util.Time;
@@ -58,12 +60,21 @@ public class LevelEditorScene extends Scene{
         0, 1, 3  // bottom left triangle
     };
 
+    GameObject testObj;
+    private boolean firstTime = false;
     public LevelEditorScene(){
 
     }
 
     @Override
     public void init(){
+        System.out.println("Creating 'test object'");
+        this.testObj = new GameObject("test object");
+        this.testObj.addComponent(new SpriteRenderer());
+        this.testObj.addComponent(new FontRenderer());
+        this.addGameObjectToScene(this.testObj);
+
+        this.camera = new Camera(new Vector2f(-200, -300));
         this.camera = new Camera(new Vector2f());
         defaultShader = new Shader("assets/shaders/default.glsl");
         defaultShader.compileAndLink();
@@ -133,5 +144,18 @@ public class LevelEditorScene extends Scene{
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);
         defaultShader.detach();
+
+        if (!firstTime) {
+            System.out.println("Creating gameObject!");
+            GameObject go = new GameObject("Game Test 2");
+            go.addComponent(new SpriteRenderer());
+            this.addGameObjectToScene(go);
+            firstTime = true;
+        }
+
+
+        for (GameObject go : this.gameObjects) {
+            go.update(dt);
+        }
     }
 }
